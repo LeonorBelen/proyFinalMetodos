@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Métodos Numéricos</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .example-card {
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .example-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .example-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .example-card p {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+        
+        .load-btn {
+            width: 100%;
+            padding: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        
+        .load-btn:hover {
+            background: #5568d3;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+        }
+        
+        .params-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #38a169;
+        }
+        
+        .results {
+            margin-top: 30px;
+            padding: 30px;
+            background: #f7fafc;
+            border-radius: 15px;
+        }
+        
+        .results h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        
+        .explanation {
+            background: #e6f2ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .explanation h3 {
+            color: #2c5282;
+            margin-bottom: 15px;
+        }
+        
+        .formula {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 30px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        tr:nth-child(even) {
+            background: #f7fafc;
+        }
+        
+        tr:hover {
+            background: #edf2f7;
+        }
+        
+        .summary {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .summary-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f7fafc;
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+        }
+        
+        .exact-solution {
+            background: #fef3c7;
+            border: 3px solid #f59e0b;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #92400e;
+        }
+        
+        .highlight-row {
+            background: #fef3c7 !important;
+            font-weight: bold;
+            border: 2px solid #f59e0b;
+        }
+        
+        .chart-container {
+            margin: 30px 0;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        canvas {
+            max-height: 400px;
+        }
+        
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧮 Calculadora de Métodos Numéricos</h1>
+        <p class="subtitle">Resuelve ecuaciones con métodos numéricos paso a paso</p>
+        
+        <!-- Ejercicios Predefinidos -->
+        <div class="examples">
+            <div class="example-card" onclick="loadExample(1)">
+                <h3>Sistema Lineal 3x3</h3>
+                <p>Sistema de ecuaciones lineales compatible determinado</p>
+                <button class="load-btn">Cargar Ejemplo</button>
+            </div>
+            <div class="example-card" onclick="loadExample(2)">
+                <h3>Raíz de función cúbica</h3>
+                <p>Encontrar raíz de f(x) = x³ - 2x - 5 en [1, 3]</p>
+                <button class="load-btn">Cargar Ejemplo</button>
+            </div>
+            <div class="example-card" onclick="loadExample(3)">
+                <h3>Ecuación Diferencial</h3>
+                <p>Resolver dy/dx = x + y, y(0) = 1 en [0, 1]</p>
+                <button class="load-btn">Cargar Ejemplo</button>
+            </div>
+        </div>
+        
+        <!-- Formulario -->
+        <div class="form-group">
+            <label for="method">Método Numérico</label>
+            <select id="method" onchange="updateFormFields()">
+                <option value="bisection">Bisección (raíces de funciones)</option>
+                <option value="gauss-seidel">Gauss-Seidel (sistemas lineales)</option>
+                <option value="euler">Euler Explícito (EDO)</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="equation" id="equationLabel">Ecuación f(x)</label>
+            <textarea id="equation" rows="3">x^3 - 2*x - 5</textarea>
+        </div>
+        
+        <div class="params-grid">
+            <div class="form-group">
+                <label for="tolerance">Tolerancia</label>
+                <input type="number" id="tolerance" value="0.000001" step="0.000001">
+            </div>
+            <div class="form-group">
+                <label for="maxIter">Iteraciones Máximas</label>
+                <input type="number" id="maxIter" value="100">
+            </div>
+            <div class="form-group" id="intervalAGroup">
+                <label for="intervalA">Intervalo a</label>
+                <input type="number" id="intervalA" value="1" step="0.1">
+            </div>
+            <div class="form-group" id="intervalBGroup">
+                <label for="intervalB">Intervalo b</label>
+                <input type="number" id="intervalB" value="3" step="0.1">
+            </div>
+            <div class="form-group hidden" id="initialValuesGroup">
+                <label for="initialValues">Valores Iniciales (x,y,z)</label>
+                <input type="text" id="initialValues" value="0, 0, 0">
+            </div>
+            <div class="form-group hidden" id="stepSizeGroup">
+                <label for="stepSize">Paso h</label>
+                <input type="number" id="stepSize" value="0.1" step="0.01">
+            </div>
+        </div>
+        
+        <div class="btn-container">
+            <button class="btn btn-primary" onclick="solve()">▶ Resolver</button>
+            <button class="btn btn-success hidden" id="exportBtn" onclick="exportResults()">⬇ Exportar TXT</button>
+        </div>
+        
+        <!-- Loading -->
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Calculando...</p>
+        </div>
+        
+        <!-- Resultados -->
+        <div id="results" class="results hidden"></div>
+    </div>
+
+    <script>
+        let currentResults = null;
+        let currentChart = null;
+        
+        const examples = [
+            {
+                id: 1,
+                method: 'gauss-seidel',
+                equation: '10*x + y + z = 12\n2*x + 10*y - z = 13\nx + y + 5*z = 7',
+                initialValues: '0, 0, 0'
+            },
+            {
+                id: 2,
+                method: 'bisection',
+                equation: 'x^3 - 2*x - 5',
+                intervalA: 1,
+                intervalB: 3
+            },
+            {
+                id: 3,
+                method: 'euler',
+                equation: 'x + y',
+                initialValues: '1',
+                intervalA: 0,
+                intervalB: 1,
+                stepSize: 0.1
+            }
+        ];
+        
+        function loadExample(id) {
+            const ex = examples.find(e => e.id === id);
+            document.getElementById('method').value = ex.method;
+            updateFormFields();
+            
+            document.getElementById('equation').value = ex.equation;
+            if (ex.intervalA !== undefined) document.getElementById('intervalA').value = ex.intervalA;
+            if (ex.intervalB !== undefined) document.getElementById('intervalB').value = ex.intervalB;
+            if (ex.initialValues !== undefined) document.getElementById('initialValues').value = ex.initialValues;
+            if (ex.stepSize !== undefined) document.getElementById('stepSize').value = ex.stepSize;
+        }
+        
+        function updateFormFields() {
+            const method = document.getElementById('method').value;
+            const equationLabel = document.getElementById('equationLabel');
+            const intervalAGroup = document.getElementById('intervalAGroup');
+            const intervalBGroup = document.getElementById('intervalBGroup');
+            const initialValuesGroup = document.getElementById('initialValuesGroup');
+            const stepSizeGroup = document.getElementById('stepSizeGroup');
+            
+            // Ocultar todos
+            intervalAGroup.classList.add('hidden');
+            intervalBGroup.classList.add('hidden');
+            initialValuesGroup.classList.add('hidden');
+            stepSizeGroup.classList.add('hidden');
+            
+            if (method === 'bisection') {
+                equationLabel.textContent = 'Ecuación f(x)';
+                intervalAGroup.classList.remove('hidden');
+                intervalBGroup.classList.remove('hidden');
+                document.getElementById('equation').rows = 2;
+            } else if (method === 'gauss-seidel') {
+                equationLabel.textContent = 'Sistema de Ecuaciones (una por línea)';
+                initialValuesGroup.classList.remove('hidden');
+                document.getElementById('equation').rows = 4;
+            } else if (method === 'euler') {
+                equationLabel.textContent = 'Ecuación Diferencial (dy/dx = ...)';
+                intervalAGroup.classList.remove('hidden');
+                intervalBGroup.classList.remove('hidden');
+                initialValuesGroup.classList.remove('hidden');
+                stepSizeGroup.classList.remove('hidden');
+                document.getElementById('equation').rows = 2;
+                document.getElementById('initialValues').value = '1';
+            }
+        }
+        
+        function evaluateFunction(expr, x, y = 0) {
+            try {
+                let cleanExpr = expr
+                    .replace(/\^/g, '**')
+                    .replace(/\s+/g, '')
+                    .replace(/(\d)([xy])/g, '$1*$2')
+                    .replace(/([xy])(\d)/g, '$1*$2')
+                    .replace(/\)\(/g, ')*(')
+                    .replace(/(\d)\(/g, '$1*(')
+                    .replace(/\)(\d)/g, ')*$1');
+                
+                cleanExpr = cleanExpr.replace(/x/g, `(${x})`).replace(/y/g, `(${y})`);
+                return eval(cleanExpr);
+            } catch (e) {
+                return NaN;
+            }
+        }
+        
+        function bisectionMethod() {
+            const equation = document.getElementById('equation').value;
+            const tolerance = parseFloat(document.getElementById('tolerance').value);
+            const maxIter = parseInt(document.getElementById('maxIter').value);
+            let a = parseFloat(document.getElementById('intervalA').value);
+            let b = parseFloat(document.getElementById('intervalB').value);
+            
+            const iterations = [];
+            let fa = evaluateFunction(equation, a);
+            let fb = evaluateFunction(equation, b);
+            
+            if (fa * fb > 0) {
+                return { error: 'f(a) y f(b) deben tener signos opuestos' };
+            }
+            
+            // Calcular referencia con más precisión
+            let reference = null;
+            let refA = a, refB = b;
+            for (let i = 0; i < 1000; i++) {
+                const c = (refA + refB) / 2;
+                const fc = evaluateFunction(equation, c);
+                if (Math.abs(fc) < 1e-15) {
+                    reference = c;
+                    break;
+                }
+                const fRefA = evaluateFunction(equation, refA);
+                if (fRefA * fc < 0) refB = c;
+                else refA = c;
+            }
+            if (!reference) reference = (refA + refB) / 2;
+            
+            // Proceso iterativo
+            for (let i = 0; i < maxIter; i++) {
+                const c = (a + b) / 2;
+                const fc = evaluateFunction(equation, c);
+                const error = Math.abs(b - a);
+                const relativeError = reference ? Math.abs(c - reference) / Math.abs(reference) : 0;
+                
+                iterations.push({
+                    iteration: i + 1,
+                    a: a.toFixed(10),
+                    b: b.toFixed(10),
+                    c: c.toFixed(10),
+                    fc: fc.toExponential(6),
+                    error: error.toExponential(6),
+                    relativeError: relativeError.toExponential(6)
+                });
+                
+                if (error < tolerance || Math.abs(fc) < tolerance) {
+                    return {
+                        method: 'Bisección',
+                        iterations,
+                        result: c,
+                        reference,
+                        converged: true,
+                        finalError: reference ? Math.abs(c - reference) : error
+                    };
+                }
+                
+                fa = evaluateFunction(equation, a);
+                if (fa * fc < 0) {
+                    b = c;
+                } else {
+                    a = c;
+                }
+            }
+            
+            return {
+                method: 'Bisección',
+                iterations,
+                result: (a + b) / 2,
+                reference,
+                converged: false,
+                finalError: Math.abs(b - a)
+            };
+        }
+        
+        function gaussSeidelMethod() {
+            const equationText = document.getElementById('equation').value;
+            const tolerance = parseFloat(document.getElementById('tolerance').value);
+            const maxIter = parseInt(document.getElementById('maxIter').value);
+            const initialValuesText = document.getElementById('initialValues').value;
+            
+            const lines = equationText.split('\n').filter(l => l.trim());
+            const n = lines.length;
+            const A = [];
+            const b = [];
+            
+            // Parsear sistema de ecuaciones
+            for (let line of lines) {
+                const parts = line.split('=');
+                if (parts.length !== 2) continue;
+                
+                const rhs = parseFloat(parts[1].trim());
+                b.push(rhs);
+                
+                const lhs = parts[0].trim();
+                const coeffs = new Array(n).fill(0);
+                
+                // Buscar coeficientes
+                const regex = /([+-]?\s*\d*\.?\d*)\s*\*?\s*([xyz])/g;
+                let match;
+                while ((match = regex.exec(lhs)) !== null) {
+                    let coeff = match[1].replace(/\s/g, '');
+                    if (coeff === '' || coeff === '+') coeff = '1';
+                    if (coeff === '-') coeff = '-1';
+                    const variable = match[2];
+                    const idx = variable === 'x' ? 0 : variable === 'y' ? 1 : 2;
+                    if (idx < n) coeffs[idx] = parseFloat(coeff);
+                }
+                A.push(coeffs);
+            }
+            
+            // Calcular solución de referencia con más iteraciones
+            let reference = null;
+            let xRef = initialValuesText.split(',').map(v => parseFloat(v.trim())).slice(0, n);
+            for (let iter = 0; iter < 10000; iter++) {
+                const xOld = [...xRef];
+                for (let i = 0; i < n; i++) {
+                    let sum = b[i];
+                    for (let j = 0; j < n; j++) {
+                        if (i !== j) {
+                            sum -= A[i][j] * xRef[j];
+                        }
+                    }
+                    xRef[i] = sum / A[i][i];
+                }
+                const maxError = Math.max(...xRef.map((val, i) => Math.abs(val - xOld[i])));
+                if (maxError < 1e-15) {
+                    reference = [...xRef];
+                    break;
+                }
+            }
+            if (!reference) reference = [...xRef];
+            
+            const iterations = [];
+            let x = initialValuesText.split(',').map(v => parseFloat(v.trim())).slice(0, n);
+            
+            for (let iter = 0; iter < maxIter; iter++) {
+                const xOld = [...x];
+                
+                for (let i = 0; i < n; i++) {
+                    let sum = b[i];
+                    for (let j = 0; j < n; j++) {
+                        if (i !== j) {
+                            sum -= A[i][j] * x[j];
+                        }
+                    }
+                    x[i] = sum / A[i][i];
+                }
+                
+                const errors = x.map((val, i) => Math.abs(val - xOld[i]));
+                const maxError = Math.max(...errors);
+                const relativeErrors = x.map((val, i) => 
+                    Math.abs(xOld[i]) > 1e-10 ? Math.abs(val - xOld[i]) / Math.abs(xOld[i]) : 0
+                );
+                
+                iterations.push({
+                    iteration: iter + 1,
+                    x: x.map(v => v.toFixed(8)),
+                    errors: errors.map(e => e.toExponential(6)),
+                    maxError: maxError.toExponential(6),
+                    relativeError: Math.max(...relativeErrors).toExponential(6)
+                });
+                
+                if (maxError < tolerance) {
+                    return {
+                        method: 'Gauss-Seidel',
+                        iterations,
+                        result: x,
+                        reference: reference,
+                        converged: true,
+                        finalError: maxError
+                    };
+                }
+            }
+            
+            return {
+                method: 'Gauss-Seidel',
+                iterations,
+                result: x,
+                reference: reference,
+                converged: false,
+                finalError: Math.max(...x.map((val, i) => Math.abs(val)))
+            };
+        }
+        
+        function eulerMethod() {
+            const equation = document.getElementById('equation').value;
+            const a = parseFloat(document.getElementById('intervalA').value);
+            const b = parseFloat(document.getElementById('intervalB').value);
+            const h = parseFloat(document.getElementById('stepSize').value);
+            const y0 = parseFloat(document.getElementById('initialValues').value);
+            
+            const iterations = [];
+            let x = a;
+            let y = y0;
+            const numSteps = Math.floor((b - a) / h);
+            
+            // Calcular solución de referencia con paso muy pequeño
+            const hRef = (b - a) / 10000;
+            let xRef = a;
+            let yRef = y0;
+            for (let i = 0; i < 10000; i++) {
+                const dydxRef = evaluateFunction(equation, xRef, yRef);
+                yRef = yRef + hRef * dydxRef;
+                xRef = a + (i + 1) * hRef;
+            }
+            const reference = yRef;
+            
+            // Proceso iterativo normal
+            for (let i = 0; i <= numSteps; i++) {
+                const dydx = evaluateFunction(equation, x, y);
+                
+                iterations.push({
+                    iteration: i,
+                    x: x.toFixed(6),
+                    y: y.toFixed(8),
+                    dydx: dydx.toFixed(8),
+                    step: i < numSteps ? h.toFixed(6) : '-'
+                });
+                
+                if (i < numSteps) {
+                    y = y + h * dydx;
+                    x = a + (i + 1) * h;
+                }
+            }
+            
+            return {
+                method: 'Euler Explícito',
+                iterations,
+                result: y,
+                reference: reference,
+                converged: true,
+                finalX: x,
+                finalY: y
+            };
+        }
+        
+        function solve() {
+            const method = document.getElementById('method').value;
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            const exportBtn = document.getElementById('exportBtn');
+            
+            loading.classList.remove('hidden');
+            results.classList.add('hidden');
+            exportBtn.classList.add('hidden');
+            
+            setTimeout(() => {
+                let result;
+                try {
+                    if (method === 'bisection') {
+                        result = bisectionMethod();
+                    } else if (method === 'gauss-seidel') {
+                        result = gaussSeidelMethod();
+                    } else if (method === 'euler') {
+                        result = eulerMethod();
+                    }
+                    
+                    if (result.error) {
+                        results.innerHTML = `<div class="error">${result.error}</div>`;
+                    } else {
+                        currentResults = result;
+                        displayResults(result);
+                        exportBtn.classList.remove('hidden');
+                    }
+                } catch (e) {
+                    results.innerHTML = `<div class="error">Error al calcular: ${e.message}</div>`;
+                }
+                
+                loading.classList.add('hidden');
+                results.classList.remove('hidden');
+            }, 100);
+        }
+        
+        function displayResults(result) {
+            const resultsDiv = document.getElementById('results');
+            const method = document.getElementById('method').value;
+            
+            let html = `<h2>Resultados - ${result.method}</h2>`;
+            
+            // Explicación del método
+            html += '<div class="explanation"><h3>Explicación del Método</h3>';
+            
+            if (method === 'bisection') {
+                html += `
+                    <p><strong>Método de Bisección:</strong> Encuentra raíces de funciones continuas en un intervalo [a,b] donde f(a) y f(b) tienen signos opuestos.</p>
+                    <h4 style="margin-top: 15px; color: #2c5282;">Fórmulas utilizadas:</h4>
+                    <div class="formula">
+                        <strong>Punto medio:</strong><br>
+                        c = (a + b) / 2
+                    </div>
+                    <div class="formula">
+                        <strong>Error absoluto:</strong><br>
+                        E = |b - a|
+                    </div>
+                    <div class="formula">
+                        <strong>Error relativo:</strong><br>
+                        E<sub>rel</sub> = |c - x<sub>exacto</sub>| / |x<sub>exacto</sub>|
+                    </div>
+                    <div class="formula">
+                        <strong>Criterio de convergencia:</strong><br>
+                        Si f(a) · f(c) < 0 entonces b = c<br>
+                        Si f(a) · f(c) > 0 entonces a = c
+                    </div>
+                    <p style="margin-top: 10px;">Se evalúa f(c) y se actualiza el intervalo según el signo, garantizando convergencia lineal con error que se reduce a la mitad en cada iteración.</p>
+                `;
+            } else if (method === 'gauss-seidel') {
+                html += `
+                    <p><strong>Método de Gauss-Seidel:</strong> Resuelve sistemas lineales Ax = b de forma iterativa usando valores actualizados inmediatamente.</p>
+                    <h4 style="margin-top: 15px; color: #2c5282;">Fórmulas utilizadas:</h4>
+                    <div class="formula">
+                        <strong>Fórmula iterativa:</strong><br>
+                        x<sub>i</sub><sup>(k+1)</sup> = (b<sub>i</sub> - Σ<sub>j≠i</sub> a<sub>ij</sub>x<sub>j</sub>) / a<sub>ii</sub>
+                    </div>
+                    <div class="formula">
+                        <strong>Error absoluto por componente:</strong><br>
+                        e<sub>i</sub> = |x<sub>i</sub><sup>(k+1)</sup> - x<sub>i</sub><sup>(k)</sup>|
+                    </div>
+                    <div class="formula">
+                        <strong>Error máximo:</strong><br>
+                        E<sub>max</sub> = max(e<sub>1</sub>, e<sub>2</sub>, ..., e<sub>n</sub>)
+                    </div>
+                    <div class="formula">
+                        <strong>Error relativo:</strong><br>
+                        E<sub>rel</sub> = |x<sub>i</sub><sup>(k+1)</sup> - x<sub>i</sub><sup>(k)</sup>| / |x<sub>i</sub><sup>(k)</sup>|
+                    </div>
+                    <p style="margin-top: 10px;">Usa valores ya actualizados en la misma iteración, convergiendo más rápido que Jacobi para matrices diagonalmente dominantes.</p>
+                `;
+            } else if (method === 'euler') {
+                html += `
+                    <p><strong>Método de Euler Explícito:</strong> Aproxima soluciones de EDO dy/dx = f(x,y) mediante aproximación por tangentes.</p>
+                    <h4 style="margin-top: 15px; color: #2c5282;">Fórmulas utilizadas:</h4>
+                    <div class="formula">
+                        <strong>Fórmula de Euler:</strong><br>
+                        y<sub>n+1</sub> = y<sub>n</sub> + h · f(x<sub>n</sub>, y<sub>n</sub>)
+                    </div>
+                    <div class="formula">
+                        <strong>Incremento en x:</strong><br>
+                        x<sub>n+1</sub> = x<sub>n</sub> + h
+                    </div>
+                    <div class="formula">
+                        <strong>Derivada evaluada:</strong><br>
+                        dy/dx = f(x<sub>n</sub>, y<sub>n</sub>)
+                    </div>
+                    <div class="formula">
+                        <strong>Número de pasos:</strong><br>
+                        N = (x<sub>final</sub> - x<sub>inicial</sub>) / h
+                    </div>
+                    <p style="margin-top: 10px;">Error local proporcional a h², error global proporcional a h. Adecuado para problemas no rígidos con paso pequeño.</p>
+                `;
+            }
+            
+            html += '</div>';
+            
+            // Solución exacta/referencia (antes de la tabla)
+            if (result.reference) {
+                if (method === 'bisection') {
+                    html += `
+                        <div class="exact-solution">
+                            ⭐ SOLUCIÓN EXACTA (Alta Precisión): x = ${result.reference.toFixed(15)} ⭐
+                        </div>
+                    `;
+                } else if (method === 'gauss-seidel') {
+                    html += `
+                        <div class="exact-solution">
+                            ⭐ SOLUCIÓN EXACTA (Alta Precisión): <br>
+                            [${result.reference.map(v => v.toFixed(12)).join(', ')}] ⭐
+                        </div>
+                    `;
+                } else if (method === 'euler') {
+                    html += `
+                        <div class="exact-solution">
+                            ⭐ SOLUCIÓN EXACTA (Alta Precisión con h→0): <br>
+                            y(${result.finalX.toFixed(6)}) = ${result.reference.toFixed(12)} ⭐
+                        </div>
+                    `;
+                }
+            }
+            
+            // Tabla de iteraciones
+            html += '<div class="table-container"><h3>Tabla de Iteraciones</h3><table>';
+            
+            if (method === 'bisection') {
+                html += '<tr><th>Iter</th><th>a</th><th>b</th><th>c</th><th>f(c)</th><th>Error</th><th>Error Rel.</th></tr>';
+                const lastIter = result.iterations.length - 1;
+                result.iterations.forEach((row, idx) => {
+                    const isLast = idx === lastIter && result.converged;
+                    html += `<tr${isLast ? ' class="highlight-row"' : ''}>
+                        <td>${row.iteration}${isLast ? ' ✓' : ''}</td>
+                        <td>${row.a}</td>
+                        <td>${row.b}</td>
+                        <td>${row.c}</td>
+                        <td>${row.fc}</td>
+                        <td>${row.error}</td>
+                        <td>${row.relativeError}</td>
+                    </tr>`;
+                });
+            } else if (method === 'gauss-seidel') {
+                html += '<tr><th>Iter</th><th>x</th><th>y</th><th>z</th><th>Error Max</th><th>Error Rel.</th></tr>';
+                const lastIter = result.iterations.length - 1;
+                result.iterations.forEach((row, idx) => {
+                    const isLast = idx === lastIter && result.converged;
+                    html += `<tr${isLast ? ' class="highlight-row"' : ''}>
+                        <td>${row.iteration}${isLast ? ' ✓' : ''}</td>
+                        <td>${row.x[0] || '-'}</td>
+                        <td>${row.x[1] || '-'}</td>
+                        <td>${row.x[2] || '-'}</td>
+                        <td>${row.maxError}</td>
+                        <td>${row.relativeError}</td>
+                    </tr>`;
+                });
+            } else if (method === 'euler') {
+                html += '<tr><th>Paso</th><th>x</th><th>y</th><th>dy/dx</th></tr>';
+                const lastIter = result.iterations.length - 1;
+                result.iterations.forEach((row, idx) => {
+                    const isLast = idx === lastIter;
+                    html += `<tr${isLast ? ' class="highlight-row"' : ''}>
+                        <td>${row.iteration}${isLast ? ' ✓' : ''}</td>
+                        <td>${row.x}</td>
+                        <td>${row.y}</td>
+                        <td>${row.dydx}</td>
+                    </tr>`;
+                });
+            }
+            
+            html += '</table></div>';
+            
+            // Resumen
+            html += '<div class="summary"><h3>Resumen de Resultados</h3>';
+            
+            if (method === 'bisection') {
+                html += `
+                    <div class="summary-item"><strong>Raíz aproximada:</strong> x ≈ ${result.result.toFixed(10)}</div>
+                    ${result.reference ? `<div class="summary-item"><strong>Solución de referencia:</strong> x = ${result.reference.toFixed(15)}</div>` : ''}
+                    <div class="summary-item"><strong>Error final:</strong> ${result.finalError.toExponential(6)}</div>
+                    <div class="summary-item"><strong>Convergencia:</strong> ${result.converged ? '✓ Converge' : '✗ No convergió'}</div>
+                    <div class="summary-item"><strong>Iteraciones:</strong> ${result.iterations.length}</div>
+                    ${result.reference ? `<div class="summary-item"><strong>Error vs. Exacta:</strong> ${Math.abs(result.result - result.reference).toExponential(6)}</div>` : ''}
+                `;
+            } else if (method === 'gauss-seidel') {
+                html += `
+                    <div class="summary-item"><strong>Solución:</strong> [${result.result.map(v => v.toFixed(8)).join(', ')}]</div>
+                    ${result.reference ? `<div class="summary-item"><strong>Solución de referencia:</strong> [${result.reference.map(v => v.toFixed(12)).join(', ')}]</div>` : ''}
+                    <div class="summary-item"><strong>Error final:</strong> ${result.finalError.toExponential(6)}</div>
+                    <div class="summary-item"><strong>Convergencia:</strong> ${result.converged ? '✓ Converge' : '✗ No convergió'}</div>
+                    <div class="summary-item"><strong>Iteraciones:</strong> ${result.iterations.length}</div>
+                    ${result.reference ? `<div class="summary-item"><strong>Error vs. Exacta:</strong> ${Math.max(...result.result.map((v, i) => Math.abs(v - result.reference[i]))).toExponential(6)}</div>` : ''}
+                `;
+            } else if (method === 'euler') {
+                html += `
+                    <div class="summary-item"><strong>Solución final:</strong> y(${result.finalX.toFixed(6)}) ≈ ${result.finalY.toFixed(8)}</div>
+                    ${result.reference ? `<div class="summary-item"><strong>Solución de referencia:</strong> y = ${result.reference.toFixed(12)}</div>` : ''}
+                    <div class="summary-item"><strong>Pasos realizados:</strong> ${result.iterations.length - 1}</div>
+                    ${result.reference ? `<div class="summary-item"><strong>Error vs. Exacta:</strong> ${Math.abs(result.finalY - result.reference).toExponential(6)}</div>` : ''}
+                `;
+            }
+            
+            html += '</div>';
+            
+            // Gráfico
+            html += '<div class="chart-container"><h3>Visualización</h3><canvas id="resultChart"></canvas></div>';
+            
+            resultsDiv.innerHTML = html;
+            
+            // Crear gráfico
+            setTimeout(() => createChart(result), 100);
+        }
+        
+        function createChart(result) {
+            const ctx = document.getElementById('resultChart');
+            const method = document.getElementById('method').value;
+            
+            if (currentChart) {
+                currentChart.destroy();
+            }
+            
+            if (method === 'bisection') {
+                const equation = document.getElementById('equation').value;
+                const a = parseFloat(document.getElementById('intervalA').value);
+                const b = parseFloat(document.getElementById('intervalB').value);
+                const points = [];
+                
+                for (let x = a; x <= b; x += (b - a) / 100) {
+                    points.push({ x: x, y: evaluateFunction(equation, x) });
+                }
+                
+                currentChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        datasets: [{
+                            label: 'f(x)',
+                            data: points,
+                            borderColor: 'rgb(102, 126, 234)',
+                            tension: 0.1
+                        }, {
+                            label: 'Raíz',
+                            data: [{ x: result.result, y: 0 }],
+                            backgroundColor: 'rgb(255, 99, 132)',
+                            pointRadius: 8,
+                            type: 'scatter'
+                        }, {
+                            label: 'y = 0',
+                            data: [{ x: a, y: 0 }, { x: b, y: 0 }],
+                            borderColor: 'rgb(200, 200, 200)',
+                            borderDash: [5, 5]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { type: 'linear', title: { display: true, text: 'x' } },
+                            y: { title: { display: true, text: 'f(x)' } }
+                        }
+                    }
+                });
+            } else if (method === 'gauss-seidel') {
+                const data = result.iterations.map(iter => ({
+                    x: iter.iteration,
+                    x1: parseFloat(iter.x[0]),
+                    x2: parseFloat(iter.x[1] || 0),
+                    x3: parseFloat(iter.x[2] || 0)
+                }));
+                
+                currentChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(d => d.x),
+                        datasets: [{
+                            label: 'x',
+                            data: data.map(d => d.x1),
+                            borderColor: 'rgb(255, 99, 132)'
+                        }, {
+                            label: 'y',
+                            data: data.map(d => d.x2),
+                            borderColor: 'rgb(54, 162, 235)'
+                        }, {
+                            label: 'z',
+                            data: data.map(d => d.x3),
+                            borderColor: 'rgb(75, 192, 192)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { title: { display: true, text: 'Iteración' } },
+                            y: { title: { display: true, text: 'Valor' } }
+                        }
+                    }
+                });
+            } else if (method === 'euler') {
+                const data = result.iterations.map(iter => ({
+                    x: parseFloat(iter.x),
+                    y: parseFloat(iter.y)
+                }));
+                
+                currentChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        datasets: [{
+                            label: 'y(x)',
+                            data: data,
+                            borderColor: 'rgb(102, 126, 234)',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { type: 'linear', title: { display: true, text: 'x' } },
+                            y: { title: { display: true, text: 'y' } }
+                        }
+                    }
+                });
+            }
+        }
+        
+        function exportResults() {
+            if (!currentResults) return;
+            
+            const method = document.getElementById('method').value;
+            const equation = document.getElementById('equation').value;
+            let content = '';
+            
+            content += `MÉTODO: ${currentResults.method}\n`;
+            content += `FECHA: ${new Date().toLocaleString('es-ES')}\n`;
+            content += `\n========================================\n\n`;
+            
+            if (method === 'bisection') {
+                const a = document.getElementById('intervalA').value;
+                const b = document.getElementById('intervalB').value;
+                const tolerance = document.getElementById('tolerance').value;
+                const maxIter = document.getElementById('maxIter').value;
+                
+                content += `ECUACIÓN: f(x) = ${equation}\n`;
+                content += `INTERVALO: [${a}, ${b}]\n`;
+                content += `TOLERANCIA: ${tolerance}\n`;
+                content += `ITERACIONES MÁXIMAS: ${maxIter}\n\n`;
+                content += `TABLA DE ITERACIONES:\n`;
+                content += `Iter\ta\t\tb\t\tc\t\tf(c)\t\tError\t\tError Rel.\n`;
+                currentResults.iterations.forEach(row => {
+                    content += `${row.iteration}\t${row.a}\t${row.b}\t${row.c}\t${row.fc}\t${row.error}\t${row.relativeError}\n`;
+                });
+                content += `\nRESULTADO: x ≈ ${currentResults.result.toFixed(10)}\n`;
+                if (currentResults.reference) {
+                    content += `REFERENCIA: x = ${currentResults.reference.toFixed(15)}\n`;
+                    content += `ERROR FINAL: ${currentResults.finalError.toExponential(6)}\n`;
+                }
+                content += `CONVERGENCIA: ${currentResults.converged ? 'SÍ' : 'NO'}\n`;
+            } else if (method === 'gauss-seidel') {
+                const initialValues = document.getElementById('initialValues').value;
+                const tolerance = document.getElementById('tolerance').value;
+                
+                content += `SISTEMA:\n${equation}\n\n`;
+                content += `VALORES INICIALES: [${initialValues}]\n`;
+                content += `TOLERANCIA: ${tolerance}\n\n`;
+                content += `TABLA DE ITERACIONES:\n`;
+                content += `Iter\tX\t\t\tErrores\t\t\tError Max\n`;
+                currentResults.iterations.forEach(row => {
+                    content += `${row.iteration}\t[${row.x.join(', ')}]\t[${row.errors.join(', ')}]\t${row.maxError}\n`;
+                });
+                content += `\nSOLUCIÓN: [${currentResults.result.map(v => v.toFixed(8)).join(', ')}]\n`;
+                content += `ERROR FINAL: ${currentResults.finalError.toExponential(6)}\n`;
+                content += `CONVERGENCIA: ${currentResults.converged ? 'SÍ' : 'NO'}\n`;
+            } else if (method === 'euler') {
+                const a = document.getElementById('intervalA').value;
+                const initialValue = document.getElementById('initialValues').value;
+                const stepSize = document.getElementById('stepSize').value;
+                
+                content += `ECUACIÓN: dy/dx = ${equation}\n`;
+                content += `CONDICIÓN INICIAL: y(${a}) = ${initialValue}\n`;
+                content += `PASO: h = ${stepSize}\n\n`;
+                content += `TABLA DE ITERACIONES:\n`;
+                content += `Iter\tx\t\ty\t\tdy/dx\n`;
+                currentResults.iterations.forEach(row => {
+                    content += `${row.iteration}\t${row.x}\t${row.y}\t${row.dydx}\n`;
+                });
+                content += `\nSOLUCIÓN FINAL: y(${currentResults.finalX.toFixed(6)}) ≈ ${currentResults.finalY.toFixed(8)}\n`;
+            }
+            
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `resultados_${method}_${Date.now()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // Inicializar
+        updateFormFields();
+    </script>
+</body>
+</html>
